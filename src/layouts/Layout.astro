@@ -4,7 +4,7 @@ import { ClientRouter } from 'astro:transitions';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import { SITE } from '../data/site';
-import { LANGS, type Lang } from '../i18n/ui';
+import { DEFAULT_LANG, LANGS, type Lang } from '../i18n/ui';
 import { getLang, localizePath, stripLang, useTranslations } from '../i18n/utils';
 import '../styles/global.css';
 
@@ -16,19 +16,63 @@ interface Props {
 	 * which is right for every page except posts that have no translation.
 	 */
 	alternates?: Partial<Record<Lang, string>>;
+	/**
+	 * Languages in which this exact page exists, for hreflang. Defaults to all.
+	 * A post without a translation lists only its own language, so search engines
+	 * aren't told that the other language's post list is its translation.
+	 */
+	translatedIn?: Lang[];
 	/** Open Graph type: "article" for posts. */
 	type?: 'website' | 'article';
+	/** Post metadata for article:* tags and structured data. */
+	article?: { published: Date; modified?: Date; tags: string[] };
+	/** Keep this page out of search results (404, empty tag pages). */
+	noindex?: boolean;
 }
 
 const lang = getLang(Astro.currentLocale);
 const t = useTranslations(lang);
-const { title, description = t('site.description'), type = 'website' } = Astro.props;
+const { title, description = t('site.description'), type = 'website', article, noindex = false } = Astro.props;
 const ogLocale = (l: Lang) => LANGS[l].locale.replace('-', '_');
 const neutralPath = stripLang(Astro.url.pathname);
 const alternates = Object.fromEntries(
 	(Object.keys(LANGS) as Lang[]).map((l) => [l, Astro.props.alternates?.[l] ?? localizePath(l, neutralPath)]),
 ) as Record<Lang, string>;
 const fullTitle = title ? `${title} · ${SITE.title}` : SITE.title;
+const hreflangs = (Astro.props.translatedIn ?? (Object.keys(LANGS) as Lang[])).filter((l) => l in alternates);
+const abs = (path: string) => (Astro.site ? new URL(path, Astro.site).href : path);
+const url = abs(Astro.url.pathname);
+
+// Structured data (schema.org) so search engines know the page's language, type and author.
+const author = { '@type': 'Person', name: SITE.author };
+const schema = article
+	? {
+			'@context': 'https://schema.org',
+			'@type': 'BlogPosting',
+			headline: title,
+			description,
+			inLanguage: LANGS[lang].locale,
+			datePublished: article.published.toISOString(),
+			dateModified: (article.modified ?? article.published).toISOString(),
+			keywords: article.tags.join(', '),
+			author,
+			url,
+			mainEntityOfPage: url,
+			isPartOf: { '@type': 'Blog', name: SITE.title, url: abs(localizePath(lang, '/')) },
+		}
+	: neutralPath === '/'
+		? {
+				'@context': 'https://schema.org',
+				'@type': 'WebSite',
+				name: SITE.title,
+				description,
+				inLanguage: LANGS[lang].locale,
+				url,
+				author,
+			}
+		: undefined;
+// Escape "<" so post text can never close the script tag.
+const schemaJson = schema && JSON.stringify(schema).replace(/</g, '\\u003c');
 ---
 
 <!doctype html>
@@ -52,18 +96,42 @@ const fullTitle = title ? `${title} · ${SITE.title}` : SITE.title;
 				.map((l) => <meta property="og:locale:alternate" content={ogLocale(l)} />)
 		}
 		<meta name="twitter:card" content="summary" />
+		<meta name="twitter:title" content={title ?? SITE.title} />
+		<meta name="twitter:description" content={description} />
+		<meta name="author" content={SITE.author} />
+		{noindex && <meta name="robots" content="noindex, follow" />}
 		{
-			/* Absolute URLs (canonical, og:url, hreflang) appear once `site` is set in astro.config.mjs. */
-			Astro.site && (
+			article && (
 				<>
-					<link rel="canonical" href={new URL(Astro.url.pathname, Astro.site).href} />
-					<meta property="og:url" content={new URL(Astro.url.pathname, Astro.site).href} />
-					{(Object.keys(alternates) as Lang[]).map((l) => (
-						<link rel="alternate" hreflang={l} href={new URL(alternates[l], Astro.site).href} />
+					<meta property="article:published_time" content={article.published.toISOString()} />
+					{article.modified && <meta property="article:modified_time" content={article.modified.toISOString()} />}
+					{article.tags.map((tag) => (
+						<meta property="article:tag" content={tag} />
 					))}
 				</>
 			)
 		}
+		{
+			/* Absolute URLs (canonical, og:url, hreflang) appear once `site` is set in astro.config.mjs. */
+			Astro.site && !noindex && (
+				<>
+					<link rel="canonical" href={url} />
+					<meta property="og:url" content={url} />
+					{hreflangs.length > 1 && (
+						<>
+							{hreflangs.map((l) => (
+								<link rel="alternate" hreflang={l} href={abs(alternates[l])} />
+							))}
+							{hreflangs.includes(DEFAULT_LANG) && (
+								<link rel="alternate" hreflang="x-default" href={abs(alternates[DEFAULT_LANG])} />
+							)}
+						</>
+					)}
+				</>
+			)
+		}
+		<link rel="sitemap" href="/sitemap.xml" />
+		{schemaJson && <script type="application/ld+json" set:html={schemaJson} />}
 		<Font cssVariable="--font-pixel" preload />
 		<Font cssVariable="--font-sans" preload />
 		<Font cssVariable="--font-mono" />

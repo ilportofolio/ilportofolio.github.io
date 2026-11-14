@@ -15,9 +15,11 @@ const lang = getLang(Astro.currentLocale);
 const t = useTranslations(lang);
 const posts = await getPosts(lang);
 const title = tag ? t('tag.pageTitle', { tag: tagLabel(tag, lang) }) : t('posts.title');
-const description = tag ? t('tag.pageDescription', { tag: tagLabel(tag, lang) }) : undefined;
+const description = tag ? t('tag.pageDescription', { tag: tagLabel(tag, lang) }) : t('posts.description');
+// A tag with no posts in this language is an empty page: keep it out of search results.
+const empty = !!tag && !posts.some((p) => p.data.tags.includes(tag as never));
 ---
 
-<Layout title={title} description={description}>
+<Layout title={title} description={description} noindex={empty}>
 	<PostsIndex posts={posts} tag={tag} />
 </Layout>

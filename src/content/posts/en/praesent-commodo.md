@@ -1,6 +1,6 @@
 ---
 title: "Praesent commodo cursus magna"
-description: "Curabitur blandit tempus porttitor. Nullam quis risus eget urna mollis ornare vel eu leo. Maecenas faucibus mollis interdum, sed posuere consectetur est at lobortis. Cras mattis consectetur purus sit amet fermentum.."
+description: "Curabitur blandit tempus porttitor. Nullam quis risus eget urna mollis ornare vel eu leo. Maecenas faucibus mollis interdum, sed posuere consectetur est at lobortis. Cras mattis consectetur purus sit amet fermentum."
 date: 2026-07-29
 tags: [blue, green]
 ---

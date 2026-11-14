@@ -3,6 +3,7 @@ import { render } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
 import TagChip from '../components/TagChip.astro';
 import PostCard from '../components/PostCard.astro';
+import { tagLabel } from '../data/tags';
 import { LANGS, type Lang } from '../i18n/ui';
 import { formatDate, getLang, localizePath, useTranslations } from '../i18n/utils';
 import { postSlug, readingTime } from '../lib/posts';
@@ -27,7 +28,14 @@ const alternates = Object.fromEntries(
 );
 ---
 
-<Layout title={title} description={description} alternates={alternates} type="article">
+<Layout
+	title={title}
+	description={description}
+	alternates={alternates}
+	translatedIn={[lang, ...translatedIn]}
+	type="article"
+	article={{ published: date, modified: updated, tags: tags.map((id) => tagLabel(id, lang)) }}
+>
 	<article>
 		<header class="container head">
 			<a class="back" href={localizePath(lang, '/posts/')}>{t('post.back')}</a>
