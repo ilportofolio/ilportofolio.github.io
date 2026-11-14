@@ -67,6 +67,14 @@ The site is published at <https://ilportofolio.github.io> by `.github/workflows/
 
 `site` in `astro.config.mjs` holds that address; it is used for canonical, `og:url` and `hreflang` links.
 
+### Search engines
+
+- `/sitemap.xml` lists every page with its translation (hreflang), and `/robots.txt` points to it. Both are generated from the posts, so they stay current.
+- A post without a translation is listed only in its own language; it is never paired with the other language's post list.
+- Posts carry article metadata and schema.org `BlogPosting` data (language, dates, tags, author); the home page carries `WebSite` data.
+- The 404 page and tag pages with no posts are marked `noindex`.
+- After the first deploy, add the site to [Google Search Console](https://search.google.com/search-console) and submit `https://ilportofolio.github.io/sitemap.xml`.
+
 Before going public:
 
 - Replace the placeholders in `src/data/site.ts` (name, email), the tags, and the lorem ipsum posts and projects.

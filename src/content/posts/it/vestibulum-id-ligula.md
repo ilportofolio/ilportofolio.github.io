@@ -1,6 +1,6 @@
 ---
 title: "Vestibulum id ligula porta"
-description: "Curabitur blandit tempus porttitor. Nullam quis risus eget urna mollis ornare vel eu leo. Maecenas faucibus mollis interdum, sed posuere consectetur est at lobortis. Cras mattis consectetur purus sit amet fermentum.."
+description: "Curabitur blandit tempus porttitor. Nullam quis risus eget urna mollis ornare vel eu leo. Maecenas faucibus mollis interdum, sed posuere consectetur est at lobortis. Cras mattis consectetur purus sit amet fermentum."
 date: 2026-10-09
 tags: [red, violet]
 ---
