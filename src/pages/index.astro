@@ -1,11 +1,200 @@
 ---
-import Welcome from '../components/Welcome.astro';
 import Layout from '../layouts/Layout.astro';
-
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
 ---
 
-<Layout>
-	<Welcome />
+<Layout title="Blog">
+	<header class="nav">
+		<a class="logo" href="/" aria-label="Home">▲</a>
+		<nav class="tabs" aria-label="Main">
+			<a class="tab active" href="/">Home</a>
+			<a class="tab" href="#">Posts</a>
+			<a class="tab" href="#">Projects</a>
+			<a class="tab" href="#">About</a>
+		</nav>
+		<a class="cta" href="#">Contact</a>
+	</header>
+
+	<main>
+		<p class="badge"><span>New</span> First post coming soon</p>
+
+		<section class="hero" aria-label="Title">
+			<div class="guides" aria-hidden="true">
+				<span style="top: 0%"><em>722</em></span>
+				<span style="top: 34%"><em>532</em></span>
+				<span style="top: 82%"><em>0</em></span>
+				<span style="top: 100%"><em>-152</em></span>
+			</div>
+			<h1>Blog.</h1>
+		</section>
+
+		<section class="intro">
+			<p class="mono">
+				Notes on <strong>security</strong>, <strong>systems</strong> and the things I build. Written in
+				plain text, rendered with <strong>Astro</strong>.
+			</p>
+			<p class="mono">
+				This is a starting point: the palette and type come from the Geist font family, with <strong>Geist Pixel</strong> for display, Geist Sans for prose and Geist Mono for detail.
+			</p>
+			<p class="lead">A place for writing, experiments and lab notes.</p>
+		</section>
+	</main>
 </Layout>
+
+<style>
+	.nav {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 12px;
+		max-width: var(--page-width);
+		margin: 0 auto;
+		padding: 24px var(--gutter);
+	}
+
+	.logo {
+		font-size: 22px;
+		text-decoration: none;
+		line-height: 1;
+	}
+
+	.tabs {
+		display: flex;
+		gap: 2px;
+		padding: 3px;
+		border: 1px solid var(--line);
+		border-radius: 999px;
+		background: var(--bg-raised);
+	}
+
+	.tab {
+		padding: 5px 14px;
+		border-radius: 999px;
+		font-size: 13px;
+		font-weight: 500;
+		text-decoration: none;
+		color: var(--fg);
+	}
+
+	.tab:hover {
+		background: var(--line-faint);
+	}
+
+	.tab.active {
+		background: var(--pill-bg);
+		color: var(--pill-fg);
+		font-family: var(--font-pixel);
+	}
+
+	.cta {
+		padding: 7px 16px;
+		border-radius: 999px;
+		background: var(--pill-bg);
+		color: var(--pill-fg);
+		font-size: 13px;
+		font-weight: 500;
+		text-decoration: none;
+	}
+
+	main {
+		max-width: var(--page-width);
+		margin: 0 auto;
+		padding: 48px var(--gutter) 96px;
+	}
+
+	.badge {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		margin: 0 0 32px;
+		font-size: 13px;
+		color: var(--fg);
+	}
+
+	.badge span {
+		padding: 2px 8px;
+		border-radius: 999px;
+		background: var(--line);
+		font-size: 11px;
+	}
+
+	.hero {
+		position: relative;
+		margin: 0 calc(-1 * var(--gutter)) 96px;
+		padding: 0 var(--gutter);
+	}
+
+	.guides span {
+		position: absolute;
+		left: 0;
+		right: 0;
+		border-top: 1px solid var(--line-faint);
+	}
+
+	.guides em {
+		position: absolute;
+		right: var(--gutter);
+		transform: translateY(-50%);
+		padding: 1px 6px;
+		border-radius: 3px;
+		background: var(--fg);
+		color: var(--pill-fg);
+		font: 500 10px var(--font-mono);
+		font-style: normal;
+	}
+
+	h1 {
+		margin: 0;
+		font-family: var(--font-pixel);
+		font-weight: 500;
+		font-size: clamp(72px, 18vw, 240px);
+		line-height: 1;
+		letter-spacing: -0.02em;
+	}
+
+	.intro {
+		display: grid;
+		grid-template-columns: 1fr 1fr 1.4fr;
+		gap: 48px;
+		padding-top: 48px;
+		border-top: 1px solid var(--line);
+	}
+
+	.mono {
+		margin: 0;
+		font-family: var(--font-mono);
+		font-size: 14px;
+		line-height: 1.6;
+		color: var(--fg-muted);
+	}
+
+	.mono strong {
+		color: var(--fg);
+		font-weight: 400;
+	}
+
+	.lead {
+		margin: 0;
+		font-family: var(--font-pixel);
+		font-size: clamp(28px, 3.2vw, 40px);
+		line-height: 1.25;
+	}
+
+	@media (max-width: 760px) {
+		.tabs .tab:not(.active):nth-child(n + 3) {
+			display: none;
+		}
+
+		.guides em {
+			display: none;
+		}
+
+		.hero {
+			margin-bottom: 48px;
+		}
+
+		.intro {
+			grid-template-columns: 1fr;
+			gap: 24px;
+		}
+	}
+</style>
