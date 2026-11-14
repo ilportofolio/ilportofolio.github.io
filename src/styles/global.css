@@ -1,0 +1,129 @@
+/* Palette taken from vercel.com/font (dark). Change colors here only. */
+:root {
+	--bg: #000000;
+	--fg: #ededed;
+	--fg-muted: #a1a1a1;
+	--fg-subtle: #8f8f8f;
+	--line: #292929;
+	--line-faint: #1a1a1a;
+	--pill-bg: #ededed;
+	--pill-fg: #0a0a0a;
+
+	/* Glass surfaces: a faint fill, a hairline border, a blur. No shadows. */
+	--glass-bg: rgba(255, 255, 255, 0.03);
+	--glass-bg-hover: rgba(255, 255, 255, 0.05);
+	--glass-border: rgba(255, 255, 255, 0.1);
+	--glass-border-hover: rgba(255, 255, 255, 0.2);
+	--glass-blur: blur(14px) saturate(140%);
+
+	--radius: 14px;
+	--radius-sm: 8px;
+	--page-width: 1120px;
+	--prose-width: 68ch;
+	--gutter: 24px;
+}
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+html {
+	background: var(--bg);
+	color-scheme: dark;
+}
+
+body {
+	margin: 0;
+	min-height: 100vh;
+	display: flex;
+	flex-direction: column;
+	color: var(--fg);
+	font-family: var(--font-sans);
+	font-size: 16px;
+	line-height: 1.6;
+	-webkit-font-smoothing: antialiased;
+	/* Faint pixel grid, so the glass has something to sit on. */
+	background-color: var(--bg);
+	background-image:
+		linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+		linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+	background-size: 48px 48px;
+	background-position: center top;
+	background-attachment: fixed;
+}
+
+a {
+	color: inherit;
+}
+
+img {
+	max-width: 100%;
+	height: auto;
+}
+
+::selection {
+	background: var(--fg);
+	color: var(--bg);
+}
+
+:focus-visible {
+	outline: 2px solid var(--fg);
+	outline-offset: 2px;
+	border-radius: 4px;
+}
+
+.container {
+	width: 100%;
+	max-width: var(--page-width);
+	margin: 0 auto;
+	padding: 0 var(--gutter);
+}
+
+.glass {
+	background: var(--glass-bg);
+	border: 1px solid var(--glass-border);
+	border-radius: var(--radius);
+	-webkit-backdrop-filter: var(--glass-blur);
+	backdrop-filter: var(--glass-blur);
+}
+
+.eyebrow {
+	margin: 0;
+	font-family: var(--font-mono);
+	font-size: 12px;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	color: var(--fg-subtle);
+}
+
+.display {
+	margin: 0;
+	font-family: var(--font-pixel);
+	font-weight: 500;
+	line-height: 1.05;
+	letter-spacing: -0.01em;
+}
+
+.sr-only {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+	clip: rect(0 0 0 0);
+	white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+	:root {
+		--gutter: 16px;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	* {
+		transition: none !important;
+		animation: none !important;
+	}
+}

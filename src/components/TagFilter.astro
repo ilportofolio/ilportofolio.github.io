@@ -1,0 +1,88 @@
+---
+import { TAGS } from '../data/tags';
+import { getLang, localizePath, useTranslations } from '../i18n/utils';
+import type { Post } from '../lib/posts';
+
+interface Props {
+	posts: Post[];
+	/** The tag currently being filtered on, or undefined for "All". */
+	active?: string;
+}
+
+const { posts, active } = Astro.props;
+const lang = getLang(Astro.currentLocale);
+const t = useTranslations(lang);
+const count = (id: string) => posts.filter((p) => (p.data.tags as string[]).includes(id)).length;
+---
+
+<nav class="filter" aria-label={t('filter.label')}>
+	<a class:list={['btn', { active: !active }]} href={localizePath(lang, '/posts/')} aria-current={!active ? 'page' : undefined}>
+		{t('filter.all')} <span class="n">{posts.length}</span>
+	</a>
+	{
+		TAGS.map((tag) => (
+			<a
+				class:list={['btn', { active: active === tag.id }]}
+				href={localizePath(lang, `/tags/${tag.id}/`)}
+				style={`--tag: ${tag.color}`}
+				aria-current={active === tag.id ? 'page' : undefined}
+			>
+				<span class="dot" aria-hidden="true" />
+				{tag.label[lang]} <span class="n">{count(tag.id)}</span>
+			</a>
+		))
+	}
+</nav>
+
+<style>
+	.filter {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px;
+	}
+
+	.btn {
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		padding: 6px 14px;
+		border: 1px solid var(--glass-border);
+		border-radius: 999px;
+		background: var(--glass-bg);
+		-webkit-backdrop-filter: var(--glass-blur);
+		backdrop-filter: var(--glass-blur);
+		font-size: 13px;
+		font-weight: 500;
+		text-decoration: none;
+		transition:
+			border-color 0.15s,
+			background-color 0.15s;
+	}
+
+	.btn:hover {
+		border-color: var(--tag, var(--glass-border-hover));
+		background: var(--glass-bg-hover);
+	}
+
+	.btn.active {
+		background: var(--pill-bg);
+		border-color: var(--pill-bg);
+		color: var(--pill-fg);
+	}
+
+	.dot {
+		width: 8px;
+		height: 8px;
+		background: var(--tag);
+	}
+
+	.n {
+		font-family: var(--font-mono);
+		font-size: 11px;
+		color: var(--fg-subtle);
+	}
+
+	.active .n {
+		color: #555;
+	}
+</style>

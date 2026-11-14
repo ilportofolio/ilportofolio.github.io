@@ -1,0 +1,95 @@
+// Interface strings for every language. English lives at /, Italian at /it/.
+// To add a language: add it here, to `i18n.locales` in astro.config.mjs,
+// to the tag labels in src/data/tags.ts, and add its route files under src/pages/<lang>/.
+
+export const LANGS = {
+	en: { label: 'English', short: 'EN', locale: 'en-GB' },
+	it: { label: 'Italiano', short: 'IT', locale: 'it-IT' },
+} as const;
+
+export type Lang = keyof typeof LANGS;
+export const DEFAULT_LANG: Lang = 'en';
+
+const en = {
+	'site.description': 'Notes, experiments and lab write-ups.',
+	'nav.label': 'Main',
+	'nav.home': 'Home',
+	'nav.posts': 'Posts',
+	'nav.projects': 'Projects',
+	'nav.contact': 'Contact',
+	'nav.language': 'Language',
+	'home.label': 'Introduction',
+	'home.browse': 'Browse by tag',
+	'home.latest': 'Latest',
+	'home.allPosts': 'All posts →',
+	'filter.label': 'Filter posts by tag',
+	'filter.all': 'All',
+	'posts.title': 'Posts',
+	'posts.eyebrow': 'Archive',
+	'posts.total': '{n} posts in total. Pick a tag to filter.',
+	'posts.total.one': '1 post in total. Pick a tag to filter.',
+	'posts.tagged': '{n} posts tagged {tag}.',
+	'posts.tagged.one': '1 post tagged {tag}.',
+	'posts.empty': 'No posts here yet.',
+	'tag.eyebrow': 'Tag',
+	'tag.pageTitle': '{tag} posts',
+	'tag.pageDescription': 'All posts tagged {tag}.',
+	'post.back': '← All posts',
+	'post.minRead': '{n} min read',
+	'post.updated': 'Updated {date}',
+	'post.newer': '← Newer',
+	'post.older': 'Older →',
+	'post.more': 'More posts',
+	'post.related': 'Related',
+	'post.draft': 'Draft',
+	'projects.title': 'Projects',
+	'projects.eyebrow': 'Work',
+	'projects.sub': 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+	'footer.credits': 'Set in Geist · Built with Astro',
+	'a11y.skip': 'Skip to content',
+	'post.toc': 'On this page',
+};
+
+export type UIKey = keyof typeof en;
+
+const it: Record<UIKey, string> = {
+	'site.description': 'Appunti, esperimenti e resoconti di laboratorio.',
+	'nav.label': 'Principale',
+	'nav.home': 'Home',
+	'nav.posts': 'Articoli',
+	'nav.projects': 'Progetti',
+	'nav.contact': 'Contatti',
+	'nav.language': 'Lingua',
+	'home.label': 'Introduzione',
+	'home.browse': 'Sfoglia per tag',
+	'home.latest': 'Ultimi',
+	'home.allPosts': 'Tutti gli articoli →',
+	'filter.label': 'Filtra gli articoli per tag',
+	'filter.all': 'Tutti',
+	'posts.title': 'Articoli',
+	'posts.eyebrow': 'Archivio',
+	'posts.total': '{n} articoli in totale. Scegli un tag per filtrare.',
+	'posts.total.one': '1 articolo in totale. Scegli un tag per filtrare.',
+	'posts.tagged': '{n} articoli con il tag {tag}.',
+	'posts.tagged.one': '1 articolo con il tag {tag}.',
+	'posts.empty': 'Ancora nessun articolo qui.',
+	'tag.eyebrow': 'Tag',
+	'tag.pageTitle': 'Articoli: {tag}',
+	'tag.pageDescription': 'Tutti gli articoli con il tag {tag}.',
+	'post.back': '← Tutti gli articoli',
+	'post.minRead': '{n} min di lettura',
+	'post.updated': 'Aggiornato il {date}',
+	'post.newer': '← Più recente',
+	'post.older': 'Meno recente →',
+	'post.more': 'Altri articoli',
+	'post.related': 'Correlati',
+	'post.draft': 'Bozza',
+	'projects.title': 'Progetti',
+	'projects.eyebrow': 'Lavori',
+	'projects.sub': 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+	'footer.credits': 'Composto in Geist · Realizzato con Astro',
+	'a11y.skip': 'Vai al contenuto',
+	'post.toc': 'In questa pagina',
+};
+
+export const UI: Record<Lang, Record<UIKey, string>> = { en, it };

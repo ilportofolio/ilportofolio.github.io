@@ -1,0 +1,421 @@
+---
+import { render } from 'astro:content';
+import Layout from '../layouts/Layout.astro';
+import TagChip from '../components/TagChip.astro';
+import PostCard from '../components/PostCard.astro';
+import { LANGS, type Lang } from '../i18n/ui';
+import { formatDate, getLang, localizePath, useTranslations } from '../i18n/utils';
+import { postSlug, readingTime } from '../lib/posts';
+import type { PostPageProps } from '../lib/paths';
+
+type Props = PostPageProps;
+
+const { post, newer, older, related, translatedIn } = Astro.props;
+const lang = getLang(Astro.currentLocale);
+const t = useTranslations(lang);
+const { title, description, date, updated, tags } = post.data;
+const { Content, headings } = await render(post);
+const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
+const href = (p: typeof post) => localizePath(lang, `/posts/${postSlug(p)}/`);
+
+// Language switcher: go to the translated post, or to the post list when there is none.
+const alternates = Object.fromEntries(
+	(Object.keys(LANGS) as Lang[]).map((l) => [
+		l,
+		l === lang || translatedIn.includes(l) ? localizePath(l, `/posts/${postSlug(post)}/`) : localizePath(l, '/posts/'),
+	]),
+);
+---
+
+<Layout title={title} description={description} alternates={alternates} type="article">
+	<article>
+		<header class="container head">
+			<a class="back" href={localizePath(lang, '/posts/')}>{t('post.back')}</a>
+			<div class="tags">{tags.map((id) => <TagChip id={id} />)}</div>
+			<h1 class="display">{title}</h1>
+			<p class="lede">{description}</p>
+			<p class="meta">
+				<time datetime={date.toISOString()}>{formatDate(date, lang)}</time>
+				<span aria-hidden="true">·</span>
+				<span>{t('post.minRead', { n: readingTime(post.body) })}</span>
+				{updated && <span>· {t('post.updated', { date: formatDate(updated, lang) })}</span>}
+			</p>
+		</header>
+
+		<div class="container layout">
+			<div class="body glass">
+				<div class="prose">
+					<Content />
+				</div>
+			</div>
+			{
+				toc.length > 1 && (
+					<nav class="toc" aria-labelledby="toc-title">
+						<p class="eyebrow" id="toc-title">{t('post.toc')}</p>
+						<ol>
+							{toc.map((h) => (
+								<li class:list={[`d${h.depth}`]}>
+									<a href={`#${h.slug}`}>{h.text}</a>
+								</li>
+							))}
+						</ol>
+					</nav>
+				)
+			}
+		</div>
+	</article>
+
+	<nav class="container pager" aria-label={t('post.more')}>
+		{
+			newer ? (
+				<a class="glass step" href={href(newer)}>
+					<span class="eyebrow">{t('post.newer')}</span>
+					<span class="t">{newer.data.title}</span>
+				</a>
+			) : (
+				<span />
+			)
+		}
+		{
+			older && (
+				<a class="glass step next" href={href(older)}>
+					<span class="eyebrow">{t('post.older')}</span>
+					<span class="t">{older.data.title}</span>
+				</a>
+			)
+		}
+	</nav>
+
+	{
+		related.length > 0 && (
+			<section class="container related" aria-labelledby="related">
+				<h2 class="eyebrow" id="related">{t('post.related')}</h2>
+				<div class="rgrid">
+					{related.map((p) => (
+						<PostCard post={p} level={3} />
+					))}
+				</div>
+			</section>
+		)
+	}
+</Layout>
+
+<style>
+	.head {
+		display: grid;
+		gap: 16px;
+		max-width: calc(var(--prose-width) + 2 * var(--gutter) + 96px);
+		padding-top: 40px;
+		padding-bottom: 32px;
+	}
+
+	.back {
+		justify-self: start;
+		font-family: var(--font-mono);
+		font-size: 12px;
+		color: var(--fg-subtle);
+		text-decoration: none;
+	}
+
+	.back:hover {
+		color: var(--fg);
+	}
+
+	.tags {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 6px;
+	}
+
+	h1 {
+		font-size: clamp(36px, 6vw, 64px);
+		overflow-wrap: break-word;
+	}
+
+	.lede {
+		margin: 0;
+		font-size: 19px;
+		color: var(--fg-muted);
+	}
+
+	.meta {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px;
+		margin: 0;
+		font-family: var(--font-mono);
+		font-size: 12px;
+		color: var(--fg-subtle);
+	}
+
+	/* Body stays centred; the table of contents sits in the right-hand margin on wide screens. */
+	.layout {
+		max-width: none;
+		display: grid;
+		grid-template-columns: 1fr min(100%, calc(var(--prose-width) + 96px)) 1fr;
+		column-gap: 32px;
+	}
+
+	.body {
+		grid-column: 2;
+		min-width: 0;
+		padding: 48px;
+	}
+
+	.toc {
+		display: none;
+		grid-column: 3;
+		align-self: start;
+		position: sticky;
+		top: 32px;
+		max-width: 220px;
+	}
+
+	.toc ol {
+		display: grid;
+		gap: 2px;
+		margin: 12px 0 0;
+		padding: 0 0 0 12px;
+		border-left: 1px solid var(--line);
+		list-style: none;
+	}
+
+	.toc a {
+		display: block;
+		padding: 3px 0;
+		font-size: 13px;
+		line-height: 1.4;
+		color: var(--fg-subtle);
+		text-decoration: none;
+		transition: color 0.15s;
+	}
+
+	.toc .d3 a {
+		padding-left: 12px;
+	}
+
+	.toc a:hover,
+	.toc a[aria-current='true'] {
+		color: var(--fg);
+	}
+
+	@media (min-width: 1360px) {
+		.toc {
+			display: block;
+		}
+	}
+
+	.pager,
+	.related {
+		max-width: calc(var(--prose-width) + 2 * var(--gutter) + 96px);
+	}
+
+	.pager {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 16px;
+		margin-top: 32px;
+	}
+
+	.step {
+		display: grid;
+		gap: 6px;
+		padding: 18px 22px;
+		text-decoration: none;
+		transition: border-color 0.2s;
+	}
+
+	.step:hover {
+		border-color: var(--glass-border-hover);
+	}
+
+	.next {
+		text-align: right;
+		grid-column: 2;
+	}
+
+	.t {
+		font-weight: 500;
+	}
+
+	.related {
+		display: grid;
+		gap: 16px;
+		margin-top: 64px;
+	}
+
+	.rgrid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+		gap: 16px;
+	}
+
+	/* Reading typography */
+	.prose {
+		max-width: var(--prose-width);
+		margin: 0 auto;
+		font-size: 18px;
+		line-height: 1.75;
+		color: #d4d4d4;
+	}
+
+	.prose :global(> :first-child) {
+		margin-top: 0;
+	}
+
+	.prose :global(> :last-child) {
+		margin-bottom: 0;
+	}
+
+	.prose :global(p),
+	.prose :global(ul),
+	.prose :global(ol),
+	.prose :global(blockquote),
+	.prose :global(pre) {
+		margin: 0 0 1.4em;
+	}
+
+	.prose :global(h2),
+	.prose :global(h3) {
+		color: var(--fg);
+		font-weight: 600;
+		letter-spacing: -0.01em;
+		line-height: 1.3;
+		scroll-margin-top: 24px;
+	}
+
+	.prose :global(h2) {
+		margin: 2.2em 0 0.7em;
+		padding-top: 1.2em;
+		border-top: 1px solid var(--line-faint);
+		font-size: 26px;
+	}
+
+	.prose :global(h3) {
+		margin: 1.8em 0 0.5em;
+		font-size: 20px;
+	}
+
+	.prose :global(a) {
+		color: var(--fg);
+		text-decoration-color: var(--fg-subtle);
+		text-underline-offset: 3px;
+	}
+
+	.prose :global(a:hover) {
+		text-decoration-color: var(--fg);
+	}
+
+	.prose :global(strong) {
+		color: var(--fg);
+	}
+
+	.prose :global(ul),
+	.prose :global(ol) {
+		padding-left: 1.3em;
+	}
+
+	.prose :global(li) {
+		margin: 0.35em 0;
+		padding-left: 0.2em;
+	}
+
+	.prose :global(ul li::marker) {
+		content: '■  ';
+		font-size: 0.6em;
+		color: var(--fg-subtle);
+	}
+
+	.prose :global(ol li::marker) {
+		font-family: var(--font-mono);
+		font-size: 0.85em;
+		color: var(--fg-subtle);
+	}
+
+	.prose :global(blockquote) {
+		padding: 4px 0 4px 20px;
+		border-left: 2px solid var(--fg-subtle);
+		color: var(--fg-muted);
+	}
+
+	.prose :global(blockquote p:last-child) {
+		margin-bottom: 0;
+	}
+
+	.prose :global(code) {
+		font-family: var(--font-mono);
+		font-size: 0.86em;
+	}
+
+	.prose :global(:not(pre) > code) {
+		padding: 0.15em 0.4em;
+		border: 1px solid var(--glass-border);
+		border-radius: 5px;
+		background: var(--glass-bg);
+	}
+
+	.prose :global(pre) {
+		padding: 18px 20px;
+		overflow-x: auto;
+		border: 1px solid var(--glass-border);
+		border-radius: var(--radius-sm);
+		background: rgba(0, 0, 0, 0.5) !important;
+		font-size: 15px;
+		line-height: 1.6;
+	}
+
+	.prose :global(hr) {
+		margin: 2.5em 0;
+		border: 0;
+		border-top: 1px solid var(--line);
+	}
+
+	@media (max-width: 1359px) {
+		.layout {
+			column-gap: 0;
+		}
+	}
+
+	@media (max-width: 640px) {
+		.body {
+			padding: 24px 20px;
+		}
+
+		.prose {
+			font-size: 17px;
+		}
+
+		.pager {
+			grid-template-columns: 1fr;
+		}
+
+		.next {
+			grid-column: 1;
+		}
+	}
+</style>
+
+<script>
+	// Highlight the table-of-contents entry for the section being read:
+	// the last heading that has scrolled past the top quarter of the screen.
+	function trackToc() {
+		const links = [...document.querySelectorAll<HTMLAnchorElement>('.toc a')];
+		if (!links.length) return;
+		const targets = links
+			.map((a) => [a, document.getElementById(decodeURIComponent(a.hash.slice(1)))] as const)
+			.filter((pair): pair is readonly [HTMLAnchorElement, HTMLElement] => !!pair[1]);
+		let frame = 0;
+		const update = () => {
+			frame = 0;
+			const line = window.innerHeight * 0.25;
+			let current: HTMLAnchorElement | undefined;
+			for (const [a, el] of targets) if (el.getBoundingClientRect().top <= line) current = a;
+			links.forEach((a) => (a === current ? a.setAttribute('aria-current', 'true') : a.removeAttribute('aria-current')));
+		};
+		const onScroll = () => (frame ||= requestAnimationFrame(update));
+		window.addEventListener('scroll', onScroll, { passive: true });
+		document.addEventListener('astro:before-swap', () => window.removeEventListener('scroll', onScroll), { once: true });
+		update();
+	}
+	document.addEventListener('astro:page-load', trackToc);
+</script>

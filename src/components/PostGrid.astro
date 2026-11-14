@@ -1,0 +1,54 @@
+---
+import PostCard from './PostCard.astro';
+import { getLang, useTranslations } from '../i18n/utils';
+import type { Post } from '../lib/posts';
+
+interface Props {
+	posts: Post[];
+	/** Heading level for each card title. */
+	level?: 2 | 3;
+}
+
+const { posts, level = 2 } = Astro.props;
+const t = useTranslations(getLang(Astro.currentLocale));
+---
+
+{
+	posts.length ? (
+		<ul class="grid">
+			{posts.map((post) => (
+				<li>
+					<PostCard post={post} level={level} />
+				</li>
+			))}
+		</ul>
+	) : (
+		<p class="empty glass">{t('posts.empty')}</p>
+	)
+}
+
+<style>
+	.grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
+		gap: 16px;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.grid li {
+		display: flex;
+	}
+
+	.grid li > :global(*) {
+		flex: 1;
+	}
+
+	.empty {
+		margin: 0;
+		padding: 32px;
+		text-align: center;
+		color: var(--fg-muted);
+	}
+</style>

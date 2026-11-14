@@ -1,0 +1,10 @@
+---
+import PostsPage from '../../../views/PostsPage.astro';
+import { tagPaths } from '../../../lib/paths';
+
+export const getStaticPaths = tagPaths;
+
+const { tag } = Astro.params;
+---
+
+<PostsPage tag={tag} />

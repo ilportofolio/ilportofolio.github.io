@@ -1,71 +1,108 @@
 ---
 import { Font } from 'astro:assets';
+import { ClientRouter } from 'astro:transitions';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { SITE } from '../data/site';
+import { LANGS, type Lang } from '../i18n/ui';
+import { getLang, localizePath, stripLang, useTranslations } from '../i18n/utils';
+import '../styles/global.css';
 
 interface Props {
 	title?: string;
+	description?: string;
+	/**
+	 * The same page in each language. Defaults to swapping the language prefix,
+	 * which is right for every page except posts that have no translation.
+	 */
+	alternates?: Partial<Record<Lang, string>>;
+	/** Open Graph type: "article" for posts. */
+	type?: 'website' | 'article';
 }
 
-const { title = 'Blog' } = Astro.props;
+const lang = getLang(Astro.currentLocale);
+const t = useTranslations(lang);
+const { title, description = t('site.description'), type = 'website' } = Astro.props;
+const ogLocale = (l: Lang) => LANGS[l].locale.replace('-', '_');
+const neutralPath = stripLang(Astro.url.pathname);
+const alternates = Object.fromEntries(
+	(Object.keys(LANGS) as Lang[]).map((l) => [l, Astro.props.alternates?.[l] ?? localizePath(l, neutralPath)]),
+) as Record<Lang, string>;
+const fullTitle = title ? `${title} · ${SITE.title}` : SITE.title;
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang={lang}>
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta name="color-scheme" content="dark" />
+		<meta name="description" content={description} />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
+		<meta name="theme-color" content="#000000" />
 		<meta name="generator" content={Astro.generator} />
+		<meta property="og:type" content={type} />
+		<meta property="og:site_name" content={SITE.title} />
+		<meta property="og:title" content={title ?? SITE.title} />
+		<meta property="og:description" content={description} />
+		<meta property="og:locale" content={ogLocale(lang)} />
+		{
+			(Object.keys(LANGS) as Lang[])
+				.filter((l) => l !== lang)
+				.map((l) => <meta property="og:locale:alternate" content={ogLocale(l)} />)
+		}
+		<meta name="twitter:card" content="summary" />
+		{
+			/* Absolute URLs (canonical, og:url, hreflang) appear once `site` is set in astro.config.mjs. */
+			Astro.site && (
+				<>
+					<link rel="canonical" href={new URL(Astro.url.pathname, Astro.site).href} />
+					<meta property="og:url" content={new URL(Astro.url.pathname, Astro.site).href} />
+					{(Object.keys(alternates) as Lang[]).map((l) => (
+						<link rel="alternate" hreflang={l} href={new URL(alternates[l], Astro.site).href} />
+					))}
+				</>
+			)
+		}
 		<Font cssVariable="--font-pixel" preload />
 		<Font cssVariable="--font-sans" preload />
 		<Font cssVariable="--font-mono" />
-		<title>{title}</title>
+		<title>{fullTitle}</title>
+		<ClientRouter />
 	</head>
 	<body>
-		<slot />
+		<a class="skip" href="#main">{t('a11y.skip')}</a>
+		<Header alternates={alternates} />
+		<main id="main">
+			<slot />
+		</main>
+		<Footer />
 	</body>
 </html>
 
-<style is:global>
-	/* Palette taken from vercel.com/font (dark) */
-	:root {
-		--bg: #000000;
-		--bg-raised: #0a0a0a;
-		--fg: #ededed;
-		--fg-muted: #a1a1a1;
-		--fg-subtle: #8f8f8f;
-		--line: #292929;
-		--line-faint: #1a1a1a;
-		--pill-bg: #ededed;
-		--pill-fg: #0a0a0a;
-		--radius: 6px;
-		--page-width: 1200px;
-		--gutter: 24px;
+<style>
+	main {
+		flex: 1;
+		padding-bottom: 96px;
 	}
 
-	*,
-	*::before,
-	*::after {
-		box-sizing: border-box;
+	/* Hidden until focused with the keyboard. */
+	.skip {
+		position: absolute;
+		top: 12px;
+		left: 12px;
+		z-index: 100;
+		padding: 8px 16px;
+		border-radius: 999px;
+		background: var(--pill-bg);
+		color: var(--pill-fg);
+		font-size: 13px;
+		font-weight: 500;
+		text-decoration: none;
+		transform: translateY(-200%);
 	}
 
-	html,
-	body {
-		margin: 0;
-		min-height: 100%;
-		background: var(--bg);
-		color: var(--fg);
-		font-family: var(--font-sans);
-		-webkit-font-smoothing: antialiased;
-	}
-
-	a {
-		color: inherit;
-	}
-
-	::selection {
-		background: var(--fg);
-		color: var(--bg);
+	.skip:focus {
+		transform: none;
 	}
 </style>

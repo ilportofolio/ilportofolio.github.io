@@ -1,0 +1,114 @@
+---
+import TagChip from './TagChip.astro';
+import { formatDate, getLang, localizePath, useTranslations } from '../i18n/utils';
+import { postSlug, readingTime, type Post } from '../lib/posts';
+
+interface Props {
+	post: Post;
+	/** Heading level, so cards nest correctly under the page's headings. */
+	level?: 2 | 3;
+}
+
+const { post, level = 2 } = Astro.props;
+const lang = getLang(Astro.currentLocale);
+const t = useTranslations(lang);
+const { title, description, date, tags, draft } = post.data;
+const Heading = `h${level}` as 'h2' | 'h3';
+---
+
+<article class="card glass">
+	<p class="meta">
+		<time datetime={date.toISOString()}>{formatDate(date, lang)}</time>
+		<span aria-hidden="true">·</span>
+		<span>{t('post.minRead', { n: readingTime(post.body) })}</span>
+		{draft && <span class="draft">{t('post.draft')}</span>}
+	</p>
+	<Heading class="title">
+		<a href={localizePath(lang, `/posts/${postSlug(post)}/`)}>{title}</a>
+	</Heading>
+	<p class="desc">{description}</p>
+	<div class="tags">
+		{tags.map((id) => <TagChip id={id} />)}
+	</div>
+</article>
+
+<style>
+	.card {
+		position: relative;
+		display: flex;
+		flex-direction: column;
+		gap: 10px;
+		padding: 22px 24px 20px;
+		transition:
+			border-color 0.2s,
+			background-color 0.2s;
+	}
+
+	.card:hover {
+		border-color: var(--glass-border-hover);
+		background: var(--glass-bg-hover);
+	}
+
+	.meta {
+		display: flex;
+		gap: 8px;
+		margin: 0;
+		font-family: var(--font-mono);
+		font-size: 12px;
+		color: var(--fg-subtle);
+	}
+
+	.draft {
+		margin-left: auto;
+		color: var(--fg);
+	}
+
+	.title {
+		margin: 0;
+		font-size: 20px;
+		font-weight: 600;
+		line-height: 1.3;
+		letter-spacing: -0.01em;
+	}
+
+	/* The whole card is clickable; tag chips sit above this layer. */
+	.title a {
+		text-decoration: none;
+	}
+
+	/* Keyboard focus outlines the whole card, not just the title text. */
+	.title a:focus-visible {
+		outline: none;
+	}
+
+	.card:has(.title a:focus-visible) {
+		outline: 2px solid var(--fg);
+		outline-offset: 2px;
+	}
+
+	.title a::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		border-radius: inherit;
+	}
+
+	.desc {
+		margin: 0;
+		color: var(--fg-muted);
+		font-size: 15px;
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		line-clamp: 2;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+	}
+
+	.tags {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 6px;
+		margin-top: auto;
+		padding-top: 6px;
+	}
+</style>
