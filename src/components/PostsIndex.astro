@@ -1,0 +1,71 @@
+---
+import PostGrid from './PostGrid.astro';
+import TagFilter from './TagFilter.astro';
+import { getTag } from '../data/tags';
+import { getLang, useTranslations } from '../i18n/utils';
+import type { Post } from '../lib/posts';
+
+interface Props {
+	/** All published posts in this language (used for the filter counts). */
+	posts: Post[];
+	/** Active tag id, if this is a filtered view. */
+	tag?: string;
+}
+
+const { posts, tag } = Astro.props;
+const lang = getLang(Astro.currentLocale);
+const t = useTranslations(lang);
+const active = tag ? getTag(tag) : undefined;
+const shown = tag ? posts.filter((p) => (p.data.tags as string[]).includes(tag)) : posts;
+const n = shown.length;
+const summary = active
+	? t(n === 1 ? 'posts.tagged.one' : 'posts.tagged', { n, tag: active.label[lang] })
+	: t(n === 1 ? 'posts.total.one' : 'posts.total', { n });
+---
+
+<section class="container head">
+	<p class="eyebrow">{active ? t('tag.eyebrow') : t('posts.eyebrow')}</p>
+	<h1 class="display" style={active ? `--tag: ${active.color}` : undefined}>
+		{active ? <><span class="sq" aria-hidden="true" />{active.label[lang]}</> : `${t('posts.title')}.`}
+	</h1>
+	<p class="sub">{summary}</p>
+</section>
+
+<div class="container filter-bar">
+	<TagFilter posts={posts} active={tag} />
+</div>
+
+<section class="container">
+	<PostGrid posts={shown} />
+</section>
+
+<style>
+	.head {
+		display: grid;
+		gap: 12px;
+		padding-top: 48px;
+		padding-bottom: 32px;
+	}
+
+	h1 {
+		display: flex;
+		align-items: center;
+		gap: 0.25em;
+		font-size: clamp(56px, 10vw, 112px);
+	}
+
+	.sq {
+		width: 0.4em;
+		height: 0.4em;
+		background: var(--tag);
+	}
+
+	.sub {
+		margin: 0;
+		color: var(--fg-muted);
+	}
+
+	.filter-bar {
+		margin-bottom: 32px;
+	}
+</style>

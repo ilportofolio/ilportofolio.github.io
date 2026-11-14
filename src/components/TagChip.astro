@@ -1,0 +1,47 @@
+---
+import { getTag } from '../data/tags';
+import { getLang, localizePath } from '../i18n/utils';
+
+interface Props {
+	id: string;
+}
+
+const lang = getLang(Astro.currentLocale);
+const tag = getTag(Astro.props.id);
+---
+
+<a class="chip" href={localizePath(lang, `/tags/${tag.id}/`)} style={`--tag: ${tag.color}`}>
+	<span class="dot" aria-hidden="true"></span>{tag.label[lang]}
+</a>
+
+<style>
+	.chip {
+		position: relative;
+		z-index: 1;
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+		padding: 2px 9px 2px 7px;
+		border: 1px solid var(--glass-border);
+		border-radius: 999px;
+		font-family: var(--font-mono);
+		font-size: 11px;
+		line-height: 1.6;
+		color: var(--fg-muted);
+		text-decoration: none;
+		transition:
+			color 0.15s,
+			border-color 0.15s;
+	}
+
+	.chip:hover {
+		color: var(--fg);
+		border-color: var(--tag);
+	}
+
+	.dot {
+		width: 6px;
+		height: 6px;
+		background: var(--tag);
+	}
+</style>

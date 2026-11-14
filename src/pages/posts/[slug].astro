@@ -1,0 +1,10 @@
+---
+import PostPage from '../../views/PostPage.astro';
+import { postPaths, type PostPageProps } from '../../lib/paths';
+
+export const getStaticPaths = () => postPaths('en', ['it']);
+
+type Props = PostPageProps;
+---
+
+<PostPage {...Astro.props} />

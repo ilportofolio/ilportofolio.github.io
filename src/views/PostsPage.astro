@@ -1,0 +1,23 @@
+---
+import Layout from '../layouts/Layout.astro';
+import PostsIndex from '../components/PostsIndex.astro';
+import { tagLabel } from '../data/tags';
+import { getLang, useTranslations } from '../i18n/utils';
+import { getPosts } from '../lib/posts';
+
+interface Props {
+	/** Show only posts with this tag. */
+	tag?: string;
+}
+
+const { tag } = Astro.props;
+const lang = getLang(Astro.currentLocale);
+const t = useTranslations(lang);
+const posts = await getPosts(lang);
+const title = tag ? t('tag.pageTitle', { tag: tagLabel(tag, lang) }) : t('posts.title');
+const description = tag ? t('tag.pageDescription', { tag: tagLabel(tag, lang) }) : undefined;
+---
+
+<Layout title={title} description={description}>
+	<PostsIndex posts={posts} tag={tag} />
+</Layout>

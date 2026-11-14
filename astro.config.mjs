@@ -5,6 +5,14 @@ const geist = './node_modules/geist/dist/fonts';
 
 // https://astro.build/config
 export default defineConfig({
+	// Published on GitHub Pages by .github/workflows/deploy.yml
+	site: 'https://ilportofolio.github.io',
+	// English at /, Italian at /it/. UI strings live in src/i18n/ui.ts.
+	i18n: {
+		locales: ['en', 'it'],
+		defaultLocale: 'en',
+		routing: { prefixDefaultLocale: false },
+	},
 	fonts: [
 		{
 			// Display font: Geist Pixel (Square variant), as on vercel.com/font?type=pixel
