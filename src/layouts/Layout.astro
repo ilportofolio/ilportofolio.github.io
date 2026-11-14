@@ -1,23 +1,71 @@
+---
+import { Font } from 'astro:assets';
+
+interface Props {
+	title?: string;
+}
+
+const { title = 'Blog' } = Astro.props;
+---
+
 <!doctype html>
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="color-scheme" content="dark" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<link rel="icon" href="/favicon.ico" />
 		<meta name="generator" content={Astro.generator} />
-		<title>Astro Basics</title>
+		<Font cssVariable="--font-pixel" preload />
+		<Font cssVariable="--font-sans" preload />
+		<Font cssVariable="--font-mono" />
+		<title>{title}</title>
 	</head>
 	<body>
 		<slot />
 	</body>
 </html>
 
-<style>
+<style is:global>
+	/* Palette taken from vercel.com/font (dark) */
+	:root {
+		--bg: #000000;
+		--bg-raised: #0a0a0a;
+		--fg: #ededed;
+		--fg-muted: #a1a1a1;
+		--fg-subtle: #8f8f8f;
+		--line: #292929;
+		--line-faint: #1a1a1a;
+		--pill-bg: #ededed;
+		--pill-fg: #0a0a0a;
+		--radius: 6px;
+		--page-width: 1200px;
+		--gutter: 24px;
+	}
+
+	*,
+	*::before,
+	*::after {
+		box-sizing: border-box;
+	}
+
 	html,
 	body {
 		margin: 0;
-		width: 100%;
-		height: 100%;
+		min-height: 100%;
+		background: var(--bg);
+		color: var(--fg);
+		font-family: var(--font-sans);
+		-webkit-font-smoothing: antialiased;
+	}
+
+	a {
+		color: inherit;
+	}
+
+	::selection {
+		background: var(--fg);
+		color: var(--bg);
 	}
 </style>
