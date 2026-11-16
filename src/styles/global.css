@@ -1,3 +1,8 @@
+/* Native page transitions between pages of this site (replaces Astro's ClientRouter, which CSP doesn't support). */
+@view-transition {
+	navigation: auto;
+}
+
 /* Palette taken from vercel.com/font (dark). Change colors here only. */
 :root {
 	--bg: #000000;
