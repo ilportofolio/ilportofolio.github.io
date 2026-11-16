@@ -1,6 +1,5 @@
 ---
 import { Font } from 'astro:assets';
-import { ClientRouter } from 'astro:transitions';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import { SITE } from '../data/site';
@@ -136,7 +135,6 @@ const schemaJson = schema && JSON.stringify(schema).replace(/</g, '\\u003c');
 		<Font cssVariable="--font-sans" preload />
 		<Font cssVariable="--font-mono" />
 		<title>{fullTitle}</title>
-		<ClientRouter />
 	</head>
 	<body>
 		<a class="skip" href="#main">{t('a11y.skip')}</a>

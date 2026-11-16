@@ -1,13 +1,11 @@
 import type { Lang } from '../i18n/ui';
 
 // Post categories. Each one becomes a filter button and a page at /tags/<id>/ (and /it/tags/<id>/).
-// The names and colors are placeholders: rename them, recolor them, or add more.
 export const TAGS = [
-	{ id: 'yellow', label: { en: 'Yellow', it: 'Giallo' }, color: '#f5d90a' },
-	{ id: 'blue', label: { en: 'Blue', it: 'Blu' }, color: '#52a8ff' },
-	{ id: 'green', label: { en: 'Green', it: 'Verde' }, color: '#62c073' },
-	{ id: 'red', label: { en: 'Red', it: 'Rosso' }, color: '#ff6166' },
-	{ id: 'violet', label: { en: 'Violet', it: 'Viola' }, color: '#bf7af0' },
+	{ id: 'soc', label: { en: 'SOC', it: 'SOC' }, color: '#52a8ff' },
+	{ id: 'detection', label: { en: 'Detection', it: 'Detection' }, color: '#62c073' },
+	{ id: 'malware', label: { en: 'Malware analysis', it: 'Analisi malware' }, color: '#ff6166' },
+	{ id: 'lab', label: { en: 'Home lab', it: 'Laboratorio' }, color: '#f5d90a' },
 ] as const;
 
 export type TagId = (typeof TAGS)[number]['id'];

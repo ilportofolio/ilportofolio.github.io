@@ -1,15 +1,10 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import { getLang, useTranslations } from '../i18n/utils';
+import { PROJECTS } from '../data/projects';
+import { getLang, localizePath, useTranslations } from '../i18n/utils';
 
-const t = useTranslations(getLang(Astro.currentLocale));
-
-const projects = [
-	{ name: 'Lorem', year: '2026', blurb: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a ante.', stack: ['Astro', 'TypeScript'] },
-	{ name: 'Ipsum', year: '2026', blurb: 'Donec ullamcorper nulla non metus auctor fringilla. Vestibulum id ligula porta.', stack: ['Go', 'SQLite'] },
-	{ name: 'Dolor', year: '2025', blurb: 'Curabitur blandit tempus porttitor. Nullam quis risus eget urna mollis ornare.', stack: ['Python'] },
-	{ name: 'Sit Amet', year: '2025', blurb: 'Maecenas faucibus mollis interdum. Cras mattis consectetur purus sit amet fermentum.', stack: ['Rust', 'WASM'] },
-];
+const lang = getLang(Astro.currentLocale);
+const t = useTranslations(lang);
 ---
 
 <Layout title={t('projects.title')} description={t('projects.description')}>
@@ -21,14 +16,21 @@ const projects = [
 
 	<ul class="container grid">
 		{
-			projects.map((p) => (
+			PROJECTS.map((p) => (
 				<li class="glass card">
 					<div class="top">
-						<h2>{p.name}</h2>
-						<span class="year">{p.year}</span>
+						<h2>{p.name[lang]}</h2>
+						<span class="year">{p.period[lang]}</span>
 					</div>
-					<p>{p.blurb}</p>
+					{p.body[lang].map((para) => (
+						<p>{para}</p>
+					))}
 					<p class="stack">{p.stack.join(' · ')}</p>
+					{p.post && (
+						<a class="read" href={localizePath(lang, `/posts/${p.post}/`)}>
+							{t('projects.read')}
+						</a>
+					)}
 				</li>
 			))
 		}
@@ -54,7 +56,8 @@ const projects = [
 
 	.grid {
 		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
+		grid-template-columns: repeat(auto-fill, minmax(min(100%, 420px), 1fr));
+		align-items: start;
 		gap: 16px;
 		margin: 0 auto;
 		list-style: none;
@@ -67,16 +70,16 @@ const projects = [
 	}
 
 	.top {
-		display: flex;
-		align-items: baseline;
-		justify-content: space-between;
+		display: grid;
+		gap: 6px;
 	}
 
 	h2 {
 		margin: 0;
 		font-family: var(--font-pixel);
 		font-weight: 500;
-		font-size: 28px;
+		font-size: 24px;
+		line-height: 1.2;
 	}
 
 	.year,
@@ -89,5 +92,13 @@ const projects = [
 	p {
 		margin: 0;
 		color: var(--fg-muted);
+		line-height: 1.6;
+	}
+
+	.read {
+		justify-self: start;
+		font-family: var(--font-mono);
+		font-size: 12px;
+		color: var(--fg);
 	}
 </style>

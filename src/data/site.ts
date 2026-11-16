@@ -1,9 +1,11 @@
 import type { UIKey } from '../i18n/ui';
 
 export const SITE = {
-	title: 'Blog',
-	author: 'Your Name',
-	email: 'hello@example.com',
+	title: 'Adonay Haile Ogbazghi',
+	author: 'Adonay Haile Ogbazghi',
+	email: 'adonayhaile@proton.me',
+	linkedin: 'https://www.linkedin.com/in/adonay-haile-ogbazghi',
+	linkedinLabel: 'linkedin.com/in/adonay-haile-ogbazghi',
 };
 
 /** Main navigation. Paths are language-neutral; they get the /it/ prefix when needed. */

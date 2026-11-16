@@ -10,6 +10,32 @@ const lang = getLang(Astro.currentLocale);
 const t = useTranslations(lang);
 const posts = await getPosts(lang);
 const latest = posts.slice(0, 6);
+
+// Longer copy lives here rather than in ui.ts because it carries markup.
+const copy = {
+	en: {
+		intro: [
+			"I'm <strong>Adonay Haile Ogbazghi</strong>, a cybersecurity graduate looking for my first role as a SOC Analyst (L1) or Cybersecurity Analyst, working on detection and incident response.",
+			'I learn by building things and taking them apart: a <strong>home SOC lab</strong> where I simulate attack techniques and follow them from the endpoint to the alert, and <strong>static analysis</strong> of real malware.',
+		],
+		background: [
+			'I studied cybersecurity at <strong>ITS Umbria Academy</strong> in Perugia, where I earned a Higher Technical Diploma (EQF level 5) between 2023 and 2025. The programme covered SIEM, incident response, digital forensics and malware analysis, with labs on ransomware and phishing scenarios and a network traffic module taught with the Italian Postal and Communications Police.',
+			'During the course I spent six months as an intern at <strong>Lusios S.r.l.</strong>, a consulting firm in Perugia. I supported NIS2 audits and gap analysis: mapping the new requirements to existing controls with the NIST CSF as a reference, gathering evidence and helping to shape the remediation plan.',
+			'Since then I have kept studying on my own. I completed the <strong>Hack The Box Academy SOC Analyst</strong> path and the Google Cybersecurity Professional Certificate, followed the OpenSecurityTraining2 courses on x86-64 and WinDbg, and finished all the challenges of <strong>Flare-On 13</strong>. The projects on this site are where I put that into practice.',
+		],
+	},
+	it: {
+		intro: [
+			'Sono <strong>Adonay Haile Ogbazghi</strong>, diplomato in cybersecurity. Cerco il mio primo ruolo come SOC Analyst (L1) o Cybersecurity Analyst, in ambito detection e incident response.',
+			'Imparo costruendo le cose e smontandole: un <strong>laboratorio SOC</strong> in cui simulo tecniche di attacco e le seguo dall\'endpoint fino all\'alert, e l\'<strong>analisi statica</strong> di malware reale.',
+		],
+		background: [
+			'Ho studiato cybersecurity all\'<strong>ITS Umbria Academy</strong> di Perugia, dove ho conseguito il Diploma di Tecnico Superiore (livello EQF 5) tra il 2023 e il 2025. Il percorso comprendeva SIEM, incident response, digital forensics e analisi di malware, con laboratori su scenari di ransomware e phishing e un modulo sull\'analisi del traffico di rete tenuto con la Polizia Postale.',
+			'Durante il corso ho svolto sei mesi di tirocinio presso <strong>Lusios S.r.l.</strong>, una società di consulenza di Perugia. Ho dato supporto ad audit e gap analysis NIS2: mappare i nuovi requisiti sui controlli esistenti con il NIST CSF come riferimento, raccogliere le evidenze e contribuire al piano di remediation.',
+			'Da allora ho continuato a studiare per conto mio. Ho completato il percorso <strong>SOC Analyst di Hack The Box Academy</strong> e il Google Cybersecurity Professional Certificate, ho seguito i corsi di OpenSecurityTraining2 su x86-64 e WinDbg e ho portato a termine tutte le sfide di <strong>Flare-On 13</strong>. Nei progetti di questo sito metto in pratica tutto questo.',
+		],
+	},
+}[lang];
 ---
 
 <Layout>
@@ -20,20 +46,36 @@ const latest = posts.slice(0, 6);
 			<span style="top: 82%"><em>0</em></span>
 			<span style="top: 100%"><em>-152</em></span>
 		</div>
-		<h1 class="display">{SITE.title}.</h1>
+		<h1 class="display">
+			<span>{t('home.role.top')}</span>
+			<span>{t('home.role.bottom')}</span>
+		</h1>
+		<p class="name">{SITE.author}</p>
 	</section>
 
 	<section class="container intro">
-		<p class="mono">
-			Lorem ipsum dolor sit amet, <strong>consectetur</strong> adipiscing elit. Integer posuere erat a ante
-			venenatis dapibus.
-		</p>
-		<p class="mono">
-			Donec ullamcorper nulla non metus auctor fringilla. Vestibulum id ligula porta felis euismod <strong
-				>semper</strong
-			>.
-		</p>
-		<p class="lead">{t('site.description')}</p>
+		{copy.intro.map((para) => <p class="mono" set:html={para} />)}
+		<p class="lead">{t('home.lead')}</p>
+	</section>
+
+	<section class="container block about">
+		<div class="story" aria-labelledby="background">
+			<h2 class="eyebrow" id="background">{t('home.background')}</h2>
+			{copy.background.map((para) => <p set:html={para} />)}
+			<a class="more" href={localizePath(lang, '/projects/')}>{t('home.projects')}</a>
+		</div>
+		<aside class="glass contact" id="contact" aria-labelledby="contact-title">
+			<h2 class="eyebrow" id="contact-title">{t('home.contact')}</h2>
+			<dl>
+				<dt>{t('home.email')}</dt>
+				<dd><a href={`mailto:${SITE.email}`}>{SITE.email}</a></dd>
+				<dt>LinkedIn</dt>
+				<dd><a href={SITE.linkedin} rel="me noopener noreferrer" target="_blank">{SITE.linkedinLabel}</a></dd>
+				<dt>{t('home.availability')}</dt>
+				<dd>{t('home.availability.local')}</dd>
+				<dd>{t('home.availability.remote')}</dd>
+			</dl>
+		</aside>
 	</section>
 
 	<section class="container block" aria-labelledby="browse">
@@ -80,8 +122,73 @@ const latest = posts.slice(0, 6);
 
 	h1 {
 		position: relative;
-		font-size: clamp(72px, 18vw, 220px);
+		font-size: clamp(48px, 13vw, 150px);
 		line-height: 1;
+	}
+
+	h1 span {
+		display: block;
+	}
+
+	.name {
+		position: relative;
+		margin: 24px 0 0;
+		font-family: var(--font-mono);
+		font-size: 14px;
+		color: var(--fg-muted);
+	}
+
+	.about {
+		display: grid;
+		grid-template-columns: 1.6fr 1fr;
+		gap: 48px;
+		align-items: start;
+	}
+
+	.story {
+		display: grid;
+		gap: 16px;
+	}
+
+	.story p {
+		margin: 0;
+		line-height: 1.7;
+		color: var(--fg-muted);
+	}
+
+	.story :global(strong) {
+		color: var(--fg);
+		font-weight: 500;
+	}
+
+	.story .more {
+		justify-self: start;
+		color: var(--fg);
+	}
+
+	.contact {
+		padding: 24px;
+		scroll-margin-top: 24px;
+	}
+
+	.contact dl {
+		margin: 16px 0 0;
+	}
+
+	.contact dt {
+		margin-top: 16px;
+		font-family: var(--font-mono);
+		font-size: 12px;
+		color: var(--fg-subtle);
+	}
+
+	.contact dd {
+		margin: 4px 0 0;
+		overflow-wrap: anywhere;
+	}
+
+	.contact a {
+		color: var(--fg);
 	}
 
 	.intro {
@@ -100,7 +207,7 @@ const latest = posts.slice(0, 6);
 		color: var(--fg-muted);
 	}
 
-	.mono strong {
+	.mono :global(strong) {
 		color: var(--fg);
 		font-weight: 400;
 	}
@@ -146,6 +253,11 @@ const latest = posts.slice(0, 6);
 		.intro {
 			grid-template-columns: 1fr;
 			gap: 20px;
+		}
+
+		.about {
+			grid-template-columns: 1fr;
+			gap: 32px;
 		}
 
 		.block {
