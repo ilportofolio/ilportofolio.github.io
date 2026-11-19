@@ -1,12 +1,11 @@
 ---
-import { SITE } from '../data/site';
 import { getLang, useTranslations } from '../i18n/utils';
 
 const t = useTranslations(getLang(Astro.currentLocale));
 ---
 
 <footer class="container footer">
-	<p>© {new Date().getFullYear()} {SITE.author}</p>
+	<p>© {new Date().getFullYear()} Adonay</p>
 	<p>{t('footer.credits')}</p>
 </footer>
 
